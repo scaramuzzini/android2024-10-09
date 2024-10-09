@@ -6,11 +6,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class CharactersActivity : AppCompatActivity() {
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var characterAdapter: CharacterAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -21,15 +27,16 @@ class CharactersActivity : AppCompatActivity() {
             insets
         }
 
-        /*
-        * 1. Criar o Serviço getAllCharacters (API)
-        * 2. Criar as estruturas de dados para receber o JSON
-        * */
+        recyclerView = findViewById(R.id.recycler_view)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
         RetrofitInstance.api.getAllCharacters().enqueue(object : Callback<CharacterResponse> {
             override fun onResponse(call: Call<CharacterResponse>, response: Response<CharacterResponse>) {
                 val charactersResponse = response.body()
                 charactersResponse?.let {
                     Log.d("Resposta", it.info.count.toString())
+                    characterAdapter = CharacterAdapter(it.results)
+                    recyclerView.adapter = characterAdapter
                 }
             }
 
